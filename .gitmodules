@@ -1,0 +1,3 @@
+[submodule "u-boot-Digilent-Dev"]
+	path = u-boot-Digilent-Dev
+	url = https://github.com/ucb-bar/u-boot-Digilent-Dev.git
