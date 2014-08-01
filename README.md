@@ -71,7 +71,7 @@ As a quick summary, here's what the zybo will do when booting:
 3) Finally, u-Boot will start our linux image (uImage) on the ARM core. This requires a custom devicetree.dtb file, which we will compile shortly.
 
 
-First, you'll want to grab the u-boot source for the Zybo. Since things tend to shift around in Digilent's repos, we've made a fork to ensure a stable base for this guide. This copy of the repo also contains a modified copy of the default zybo u-boot configuration to support the RISC-V Rocket core. The repo is already present as a submodule, so you'll need to initialize it:
+First, you'll want to grab the u-boot source for the Zybo. Since things tend to shift around in Digilent's repos, we've made a fork to ensure a stable base for this guide. This copy of the repo also contains a modified copy of the default zybo u-boot configuration to support the RISC-V Rocket core. The repo is already present as a submodule, so you'll need to initialize it (this will also download the linux source for you, which you'll need in Step 5):
 
 ```sh
 [From inside the zybo repo]
@@ -122,4 +122,32 @@ Finally, we'll add in u-boot. Again, click add and ensure that Partition type is
 
 Once you've located the file, click OK and hit Create Image in the Create Zynq Boot Image window. Copy the generated boot.bin file to your sd card.
 
-NOTE about where to place mkimage?
+#### Step 5: Build Linux Kernel uImage
+
+Next, we'll move on to building the Linux Kernel uImage. Again, to keep our dependencies sane, we've created a fork of the Digilent linux repo and added a modified dts file to support Rocket's Host-Target Interface (HTIF). When you ran `git submodule update --init` back in step 3, the source for linux was pulled into `[ZYBO REPO LOCATION]/Linux-Digilent-Dev`. Enter that directory and do the following to build linux:
+
+```sh
+make ARCH=arm CROSS_COMPILE=arm-xilinx-linux-gnueabi- xilinx_zynq_defconfig
+make ARCH=arm CROSS_COMPILE=arm-xilinx-linux-gnueabi-
+```
+
+This will produce a zImage file, however we need a uImage. In order to do this, the Makefile needs to be able to run the `mkimage` program found in u-boot-Digilent-Dev/tools. Thus, we'll have to add it to our path:
+
+```sh
+export PATH=$PATH:[ZYBO REPO LOCATION]/u-boot-Digilent-Dev/tools
+make ARCH=arm CROSS_COMPILE=arm-xilinx-linux-gnueabi- UIMAGE_LOADADDR=0x8000 uImage
+```
+
+This will produce a file in `[ZYBO REPO LOCATION]/Linux-Digilent-Dev/arch/arm/boot/uImage`. Copy this file to your sdcard.
+
+Next, we'll compile our device tree, so that the kernel knows where our devices are. The copy of linux in this repo already contains a modified device tree to support the HTIF infrastructure that Rocket needs. To compile it, run the following from inside `[ZYBO REPO LOCATION]/Linux-Digilent-Dev/`.
+
+```sh
+./scripts/dtc/dtc -I dts -O dtb -o devicetree.dtb arch/arm/boot/dts/zynq-zybo.dts
+```
+
+This will produce a devicetree.dtb file, which you should copy to your sdcard.
+
+Finally, copy the uramdisk.image.gz file from `[ZYBO REPO LOCATION]/sd_image/` to your sd card. This is the root filesystem for ARM linux, which contains a copy of riscv-fesvr (frontend server) that will interact with our Rocket core on the programmable logic.
+
+At this point, there should be 4 files on your sd card.
