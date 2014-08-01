@@ -57,7 +57,7 @@ if {[string equal [get_filesets sources_1] ""]} {
 # Add files to 'sources_1' fileset
 set obj [get_filesets sources_1]
 set files [list \
- "[file normalize "$orig_proj_dir/src/bd/system.bd"]"\
+ "[file normalize "$orig_proj_dir/src/bd/system/system.bd"]"\
 ]
 add_files -norecurse -fileset $obj $files
 
@@ -137,3 +137,7 @@ set_property "needs_refresh" "1" $obj
 set_property "part" "xc7z010clg400-1" $obj
 
 puts "INFO: Project created:zybo_bsd"
+
+puts "About to generate IP"
+reset_target all [get_files "$orig_proj_dir/src/bd/system/system.bd"]
+#generate_target all [get_files "$orig_proj_dir/src/bd/system/system.bd"]
