@@ -23,7 +23,7 @@ As a quick summary, here's what the Zybo will do when booting:
 on-board ARM core. These come from the `system_wrapper.bit` file, which will be 
 part of `boot.bin` on the sd card.
 
-2) Run the First Stage BootLoader (FSBL), which is part of BOOT.bin which we will eventually create.
+2) Run the First Stage BootLoader (FSBL), which is part of boot.bin which we will eventually create.
 
 3) The FSBL will start u-Boot, which sets up the environment for linux on the ARM core.
 
@@ -84,7 +84,7 @@ After you hit next, you'll be presented with a menu with available templates.
 Select "Zynq FSBL" and click finish. Once you do so, you should see compilation 
 in progress in the console. Wait until "Build Finished" appears. Do not exit 
 Xilinx SDK yet, we'll come back to it in a couple of steps to package up 
-`BOOT.bin`.
+`boot.bin`.
 
 ####Step 3: Build u-boot for the zybo:
 
@@ -116,7 +116,7 @@ rename it. Run the following to do so:
 mv u-boot u-boot.elf
 ```
 
-#### Step 4: Create BOOT.bin
+#### Step 4: Create boot.bin
 
 At this point, we'll package up the 3 main files we've built so far: 
 `system_wrapper.bit`, the FSBL binary, and the `u-boot.elf` binary. To do so, 
@@ -148,8 +148,8 @@ to the following directory to choose your bit file:
 
 Once you've located the file, click OK.
 
-Finally, we'll add in u-boot. Again, click add and ensure that Partition type 
-is set to datafile in the window that appears. Again. click browse and select 
+Finally, we'll add in u-boot. Again, click Add and ensure that Partition type 
+is set to datafile in the window that appears. Now, click browse and select 
 `u-boot.elf` located in:
 
 ```sh
@@ -158,6 +158,7 @@ is set to datafile in the window that appears. Again. click browse and select
 
 Once you've located the file, click OK and hit Create Image in the 
 Create Zynq Boot Image window. Copy the generated boot.bin file to your sd card.
+You may now close the Xilinx SDK window.
 
 #### Step 5: Build Linux Kernel uImage
 
@@ -206,7 +207,7 @@ at the bottom of this document.
 At this point, there should be 4 files on your sd card. Continue to the 
 "Booting Up and interacting with the RISC-V Rocket core" section.
 
-Booting Up and interacting with the RISC-V Rocket core
+Booting Up and Interacting with the RISC-V Core
 --------------
 
 TODO: how to boot, run linux on rocket, telnet IP address etc.
