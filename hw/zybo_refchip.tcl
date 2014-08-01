@@ -140,4 +140,4 @@ puts "INFO: Project created:zybo_bsd"
 
 puts "About to generate IP"
 reset_target all [get_files "$orig_proj_dir/src/bd/system/system.bd"]
-#generate_target all [get_files "$orig_proj_dir/src/bd/system/system.bd"]
+generate_target all [get_files "$orig_proj_dir/src/bd/system/system.bd"]
