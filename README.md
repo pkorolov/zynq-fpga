@@ -234,3 +234,79 @@ sh -c 'cd ramdisk/ && sudo find . | sudo cpio -H newc -o' | gzip -9 > uramdisk.c
 mkimage -A arm -O linux -T ramdisk -d uramdisk.cpio.gz uramdisk.image.gz
 ```
 
+### Appendix B: Building Slave.v from reference-chip
+
+The copy of Slave.v in this repo was built from https://github.com/ucb-bar/reference-chip/tree/b121a85780639eae87469c335c9cc853ce827cab
+
+The following changes were made to allow the design to fit on the Zybo:
+
+1) Remove Rocket's uarch counters:
+
+```
+[Inside Rocket]
+
+diff --git a/src/main/scala/csr.scala b/src/main/scala/csr.scala
+index 2169055..158b749 100644
+--- a/src/main/scala/csr.scala
++++ b/src/main/scala/csr.scala
+@@ -47,7 +47,7 @@ class CSRFileIO(implicit conf: RocketConfiguration) extends Bundle {
+   val evec = UInt(OUTPUT, conf.as.vaddrBits+1)
+   val exception = Bool(INPUT)
+   val retire = UInt(INPUT, log2Up(1+conf.retireWidth))
+-  val uarch_counters = Vec.fill(16)(UInt(INPUT, log2Up(1+conf.retireWidth)))
+   +//  val uarch_counters = Vec.fill(16)(UInt(INPUT, log2Up(1+conf.retireWidth)))
+   val cause = UInt(INPUT, conf.xprlen)
+   val badvaddr_wen = Bool(INPUT)
+   val pc = UInt(INPUT, conf.as.vaddrBits+1)
+@@ -78,7 +78,7 @@ class CSRFile(implicit conf: RocketConfiguration) extends Module
+   val reg_status = Reg(new Status) // reset down below
+   val reg_time = WideCounter(conf.xprlen)
+   val reg_instret = WideCounter(conf.xprlen, io.retire)
+-  val reg_uarch_counters = io.uarch_counters.map(WideCounter(conf.xprlen, _))
+   +//  val reg_uarch_counters = io.uarch_counters.map(WideCounter(conf.xprlen, _))
+   val reg_fflags = Reg(UInt(width = 5))
+   val reg_frm = Reg(UInt(width = 3))
+
+@@ -192,8 +192,8 @@ class CSRFile(implicit conf: RocketConfiguration) extends Module
+     CSRs.tohost -> reg_tohost,
+     CSRs.fromhost -> reg_fromhost)
+
+-  for (i <- 0 until reg_uarch_counters.size)
+   -    read_mapping += (CSRs.uarch0 + i) -> reg_uarch_counters(i)
+        +//  for (i <- 0 until reg_uarch_counters.size)
++//    read_mapping += (CSRs.uarch0 + i) -> reg_uarch_counters(i)
+
+   io.rw.rdata := Mux1H(for ((k, v) <- read_mapping) yield decoded_addr(k) -> v)
+
+diff --git a/src/main/scala/dpath.scala b/src/main/scala/dpath.scala
+index ea6b59c..b5f143a 100644
+--- a/src/main/scala/dpath.scala
++++ b/src/main/scala/dpath.scala
+@@ -182,7 +182,7 @@ class Datapath(implicit conf: RocketConfiguration) extends Module
+   pcr.io.rocc <> io.rocc
+   pcr.io.pc := wb_reg_pc
+   io.ctrl.csr_replay := pcr.io.replay
+-  pcr.io.uarch_counters.foreach(_ := Bool(false))
+   +//  pcr.io.uarch_counters.foreach(_ := Bool(false))
+
+   io.ptw.ptbr := pcr.io.ptbr
+   io.ptw.invalidate := pcr.io.fatc
+```
+
+2) Modify L2CoherenceAgentConfiguration:
+
+```
+[Inside reference-chip]
+diff --git a/src/main/scala/fpga.scala b/src/main/scala/fpga.scala
+index 7f4df49..799ab2a 100644
+--- a/src/main/scala/fpga.scala
++++ b/src/main/scala/fpga.scala
+@@ -85,7 +85,7 @@ class FPGATop extends Module {
+                                           writeMaskBits = WRITE_MASK_BITS,
+                                           wordAddrBits = SUBWORD_ADDR_BITS,
+                                           atomicOpBits = ATOMIC_OP_BITS)
+-  implicit val l2 = L2CoherenceAgentConfiguration(tl, 1, 8)
+   +  implicit val l2 = L2CoherenceAgentConfiguration(tl, 1, 4)
+         implicit val mif = MemoryIFConfiguration(MEM_ADDR_BITS, MEM_DATA_BITS, MEM_TAG_BITS, 4)
+   implicit val uc = FPGAUncoreConfiguration(l2, tl, mif, ntiles, nSCR = 64, offsetBits = OFFSET_BITS)
+```
