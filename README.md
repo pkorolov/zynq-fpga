@@ -40,10 +40,10 @@ Make sure you've sourced the settings for Vivado as necessary on your system.
 
 ```sh
 $ git clone git@github.com:ucb-bar/zybo.git
-cd zybo/hw
-vivado -mode tcl -source zybo_refchip.tcl
-cd zybo_bsd
-vivado ./zybo_bsd.xpr
+$ cd zybo/hw
+$ vivado -mode tcl -source zybo_refchip.tcl
+$ cd zybo_bsd
+$ vivado ./zybo_bsd.xpr
 ```
 
 Once in Vivado, first hit "Generate Block Design" -> system.bd, then hit "Open Block Design" -> system.bd.
@@ -64,7 +64,7 @@ are all checked. Then click OK. Once the SDK launches, feel free to exit Vivado.
 In case the SDK fails to launch, the command to do so is:
 
 ```sh
-xsdk -bit [ZYBO REPO LOCATION]/hw/zybo_bsd/zybo_bsd.sdk/SDK/SDK_Export/hw/system_wrapper.bit -workspace [ZYBO REPO LOCATION]/hw/zybo_bsd/zybo_bsd.sdk/SDK/SDK_Export -hwspec [ZYBO_REPO_LOCATION]/hw/zybo_bsd/zybo_bsd.sdk/SDK/SDK_Export/hw/system.xml
+$ xsdk -bit [ZYBO REPO LOCATION]/hw/zybo_bsd/zybo_bsd.sdk/SDK/SDK_Export/hw/system_wrapper.bit -workspace [ZYBO REPO LOCATION]/hw/zybo_bsd/zybo_bsd.sdk/SDK/SDK_Export -hwspec [ZYBO_REPO_LOCATION]/hw/zybo_bsd/zybo_bsd.sdk/SDK/SDK_Export/hw/system.xml
 ```
 
 ####Step 2: Building the First-Stage BootLoader (FSBL) in Xilinx SDK
@@ -98,22 +98,22 @@ the linux source for you, which you'll need in Step 5):
 
 ```sh
 [From inside the zybo repo]
-git submodule update --init
+$ git submodule update --init
 ```
 
 Next, we'll go ahead and build u-boot. To do so, enter the following:
 
 ```sh
-cd u-boot-Digilent-Dev
-make CROSS_COMPILE=arm-xilinx-linux-gnueabi- zynq_zybo_config
-make CROSS_COMPILE=arm-xilinx-linux-gnueabi-
+$ cd u-boot-Digilent-Dev
+$ make CROSS_COMPILE=arm-xilinx-linux-gnueabi- zynq_zybo_config
+$ make CROSS_COMPILE=arm-xilinx-linux-gnueabi-
 ```
 
 Once the build completes, the file we need is called "u-boot", but we need to 
 rename it. Run the following to do so:
 
 ```sh
-mv u-boot u-boot.elf
+$ mv u-boot u-boot.elf
 ```
 
 #### Step 4: Create boot.bin
@@ -170,8 +170,8 @@ linux was pulled into `[ZYBO REPO LOCATION]/Linux-Digilent-Dev`. Enter that
 directory and do the following to build linux:
 
 ```sh
-make ARCH=arm CROSS_COMPILE=arm-xilinx-linux-gnueabi- xilinx_zynq_defconfig
-make ARCH=arm CROSS_COMPILE=arm-xilinx-linux-gnueabi-
+$ make ARCH=arm CROSS_COMPILE=arm-xilinx-linux-gnueabi- xilinx_zynq_defconfig
+$ make ARCH=arm CROSS_COMPILE=arm-xilinx-linux-gnueabi-
 ```
 
 This will produce a zImage file, however we need a uImage. In order to build a 
@@ -179,8 +179,8 @@ uImage, the Makefile needs to be able to run the `mkimage` program found in
 `u-boot-Digilent-Dev/tools`. Thus, we'll have to add it to our path:
 
 ```sh
-export PATH=$PATH:[ZYBO REPO LOCATION]/u-boot-Digilent-Dev/tools
-make ARCH=arm CROSS_COMPILE=arm-xilinx-linux-gnueabi- UIMAGE_LOADADDR=0x8000 uImage
+$ export PATH=$PATH:[ZYBO REPO LOCATION]/u-boot-Digilent-Dev/tools
+$ make ARCH=arm CROSS_COMPILE=arm-xilinx-linux-gnueabi- UIMAGE_LOADADDR=0x8000 uImage
 ```
 
 This will produce the file
@@ -193,7 +193,7 @@ support the HTIF infrastructure that Rocket needs. To compile it, run the
 following from inside `[ZYBO REPO LOCATION]/Linux-Digilent-Dev/`.
 
 ```sh
-./scripts/dtc/dtc -I dts -O dtb -o devicetree.dtb arch/arm/boot/dts/zynq-zybo.dts
+$ ./scripts/dtc/dtc -I dts -O dtb -o devicetree.dtb arch/arm/boot/dts/zynq-zybo.dts
 ```
 
 This will produce a `devicetree.dtb` file, which you should copy to your sdcard.
@@ -209,8 +209,6 @@ At this point, there should be 4 files on your sd card. Continue to the
 
 Booting Up and Interacting with the RISC-V Core
 --------------
-
-TODO: how to boot, run linux on rocket, telnet IP address etc.
 
 Finally, copy the sd_image/riscv directory to your sd card. This contains 
 a copy of the linux kernel compiled for RISC-V, along with an appropriate 
@@ -228,7 +226,7 @@ SD_ROOT/
 |-> uramdisk.image.gz
 ```
 
-Insert the microsd card in your zybo at this point you have two options for
+Insert the microsd card in your zybo. At this point you have two options for
 logging in:
 
 1) USB-UART
@@ -236,7 +234,7 @@ logging in:
 To connect over usb, do the following (the text following tty. may vary):
 
 ```sh
-screen /dev/tty.usbserial-210279575138B 115200,cs8,-parenb,-cstopb
+$ screen /dev/tty.usbserial-210279575138B 115200,cs8,-parenb,-cstopb
 ```
 
 2) Telnet
@@ -245,24 +243,24 @@ You may also connect over telnet using ethernet. The default IP address is
 `192.168.192.5`:
 
 ```sh
-telnet 192.168.192.5
+$ telnet 192.168.192.5
 ```
 
-In either case, you'll eventually need to login to the ARM system. Both the 
+In either case, you'll eventually be prompted to login to the ARM system. Both the 
 username and password are `root`.
 
 Once you're in, you'll need to mount the sd card so that we can access the files
 necessary to boot linux on the Rocket core. Do the following:
 
 ```sh
-mkdir /sdcard
-mount /dev/mmcblk0p1 /sdcard
+$ mkdir /sdcard
+$ mount /dev/mmcblk0p1 /sdcard
 ```
 
 Finally, we can go ahead and boot linux on the Rocket core:
 
 ```sh
-./fesvr-zedboard +disk=/sdcard/riscv/root_spike.bin /sdcard/riscv/vmlinux
+$ ./fesvr-zedboard +disk=/sdcard/riscv/root_spike.bin /sdcard/riscv/vmlinux
 ```
 
 Appendices
@@ -274,17 +272,17 @@ The RAMDisk that holds linux (uramdisk.image.gz) is a gzipped cpio archive
 with a u-boot header for the zybo. To open it up (will need sudo):
 
 ```sh
-dd if=sd_image/uramdisk.image.gz  bs=64 skip=1 of=uramdisk.cpio.gz
-mkdir ramdisk
-gunzip -c uramdisk.cpio.gz | sudo sh -c 'cd ramdisk/ && cpio -i'
+$ dd if=sd_image/uramdisk.image.gz  bs=64 skip=1 of=uramdisk.cpio.gz
+$ mkdir ramdisk
+$ gunzip -c uramdisk.cpio.gz | sudo sh -c 'cd ramdisk/ && cpio -i'
 ```
 
 When changing or adding files, be sure to keep track of owners, groups, and 
 permissions. When you are done, to package it back up:
 
 ```sh
-sh -c 'cd ramdisk/ && sudo find . | sudo cpio -H newc -o' | gzip -9 > uramdisk.cpio.gz
-mkimage -A arm -O linux -T ramdisk -d uramdisk.cpio.gz uramdisk.image.gz
+$ sh -c 'cd ramdisk/ && sudo find . | sudo cpio -H newc -o' | gzip -9 > uramdisk.cpio.gz
+$ mkimage -A arm -O linux -T ramdisk -d uramdisk.cpio.gz uramdisk.image.gz
 ```
 
 ### Appendix B: Building Slave.v from reference-chip
