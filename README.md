@@ -212,6 +212,59 @@ Booting Up and Interacting with the RISC-V Core
 
 TODO: how to boot, run linux on rocket, telnet IP address etc.
 
+Finally, copy the sd_image/riscv directory to your sd card. This contains 
+a copy of the linux kernel compiled for RISC-V, along with an appropriate 
+root filesystem. At this point, the directory structure of your sd card 
+should match the following:
+
+```sh
+SD_ROOT/
+|-> riscv/
+    |-> root_spike.bin
+    |-> vmlinux
+|-> boot.bin
+|-> devicetree.dtb
+|-> uImage
+|-> uramdisk.image.gz
+```
+
+Insert the microsd card in your zybo at this point you have two options for
+logging in:
+
+1) USB-UART
+
+To connect over usb, do the following (the text following tty. may vary):
+
+```sh
+screen /dev/tty.usbserial-210279575138B 115200,cs8,-parenb,-cstopb
+```
+
+2) Telnet
+
+You may also connect over telnet using ethernet. The default IP address is
+`192.168.192.5`:
+
+```sh
+telnet 192.168.192.5
+```
+
+In either case, you'll eventually need to login to the ARM system. Both the 
+username and password are `root`.
+
+Once you're in, you'll need to mount the sd card so that we can access the files
+necessary to boot linux on the Rocket core. Do the following:
+
+```sh
+mkdir /sdcard
+mount /dev/mmcblk0p1 /sdcard
+```
+
+Finally, we can go ahead and boot linux on the Rocket core:
+
+```sh
+./fesvr-zedboard +disk=/sdcard/riscv/root_spike.bin /sdcard/riscv/vmlinux
+```
+
 Appendices
 --------------
 
