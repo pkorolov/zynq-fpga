@@ -38,13 +38,11 @@ Make sure you've sourced the settings for Vivado as necessary on your system.
 
 ####Step 1: Building the Vivado Project
 
-```sh
-$ git clone git@github.com:ucb-bar/zybo.git
-$ cd zybo/hw
-$ vivado -mode tcl -source zybo_refchip.tcl
-$ cd zybo_bsd
-$ vivado ./zybo_bsd.xpr
-```
+    $ git clone git@github.com:ucb-bar/zybo.git
+    $ cd zybo/hw
+    $ vivado -mode tcl -source zybo_refchip.tcl
+    $ cd zybo_bsd
+    $ vivado ./zybo_bsd.xpr
 
 Once in Vivado, first hit "Generate Block Design" -> system.bd, then hit "Open Block Design" -> system.bd.
 
@@ -63,9 +61,7 @@ are all checked. Then click OK. Once the SDK launches, feel free to exit Vivado.
 
 In case the SDK fails to launch, the command to do so is:
 
-```sh
-$ xsdk -bit [ZYBO REPO LOCATION]/hw/zybo_bsd/zybo_bsd.sdk/SDK/SDK_Export/hw/system_wrapper.bit -workspace [ZYBO REPO LOCATION]/hw/zybo_bsd/zybo_bsd.sdk/SDK/SDK_Export -hwspec [ZYBO_REPO_LOCATION]/hw/zybo_bsd/zybo_bsd.sdk/SDK/SDK_Export/hw/system.xml
-```
+    $ xsdk -bit [ZYBO REPO LOCATION]/hw/zybo_bsd/zybo_bsd.sdk/SDK/SDK_Export/hw/system_wrapper.bit -workspace [ZYBO REPO LOCATION]/hw/zybo_bsd/zybo_bsd.sdk/SDK/SDK_Export -hwspec [ZYBO_REPO_LOCATION]/hw/zybo_bsd/zybo_bsd.sdk/SDK/SDK_Export/hw/system.xml
 
 ####Step 2: Building the First-Stage BootLoader (FSBL) in Xilinx SDK
 
@@ -96,25 +92,19 @@ zybo u-boot configuration to support the RISC-V Rocket core. The repo is already
 present as a submodule, so you'll need to initialize it (this will also download 
 the linux source for you, which you'll need in Step 5):
 
-```sh
-[From inside the zybo repo]
-$ git submodule update --init
-```
+    [From inside the zybo repo]
+    $ git submodule update --init
 
 Next, we'll go ahead and build u-boot. To do so, enter the following:
 
-```sh
-$ cd u-boot-Digilent-Dev
-$ make CROSS_COMPILE=arm-xilinx-linux-gnueabi- zynq_zybo_config
-$ make CROSS_COMPILE=arm-xilinx-linux-gnueabi-
-```
+    $ cd u-boot-Digilent-Dev
+    $ make CROSS_COMPILE=arm-xilinx-linux-gnueabi- zynq_zybo_config
+    $ make CROSS_COMPILE=arm-xilinx-linux-gnueabi-
 
 Once the build completes, the file we need is called "u-boot", but we need to 
 rename it. Run the following to do so:
 
-```sh
-$ mv u-boot u-boot.elf
-```
+    $ mv u-boot u-boot.elf
 
 #### Step 4: Create boot.bin
 
@@ -132,9 +122,7 @@ In the window that pops up, ensure that Partition type is set as bootloader and
 click browse. The file we're looking for is called `FSBL.elf`. If you've followed
 these instructions exactly, it will be located in:
 
-```sh
-[ZYBO REPO LOCATION]/hw/zybo_bsd/zybo_bsd.sdk/SDK/SDK_Export/FSBL/Debug/FSBL.elf
-```
+    [ZYBO REPO LOCATION]/hw/zybo_bsd/zybo_bsd.sdk/SDK/SDK_Export/FSBL/Debug/FSBL.elf
 
 Once you've located the file, click OK.
 
@@ -142,9 +130,7 @@ Next we'll add the bit file containing our design (with the Rocket core). Click
 add once again. This time, Partition type should be set as datafile. Navigate 
 to the following directory to choose your bit file:
 
-```sh
-[ZYBO REPO LOCATION]/hw/zybo_bsd/zybo_bsd.sdk/SDK/SDK_Export/hw_platform_0/system_wrapper.bit
-```
+    [ZYBO REPO LOCATION]/hw/zybo_bsd/zybo_bsd.sdk/SDK/SDK_Export/hw_platform_0/system_wrapper.bit
 
 Once you've located the file, click OK.
 
@@ -152,9 +138,7 @@ Finally, we'll add in u-boot. Again, click Add and ensure that Partition type
 is set to datafile in the window that appears. Now, click browse and select 
 `u-boot.elf` located in:
 
-```sh
-[ZYBO REPO LOCATION]/u-boot-Digilent-Dev/u-boot.elf
-```
+    [ZYBO REPO LOCATION]/u-boot-Digilent-Dev/u-boot.elf
 
 Once you've located the file, click OK and hit Create Image in the 
 Create Zynq Boot Image window. Copy the generated boot.bin file to your sd card.
@@ -169,19 +153,15 @@ When you ran `git submodule update --init` back in step 3, the source for
 linux was pulled into `[ZYBO REPO LOCATION]/Linux-Digilent-Dev`. Enter that 
 directory and do the following to build linux:
 
-```sh
-$ make ARCH=arm CROSS_COMPILE=arm-xilinx-linux-gnueabi- xilinx_zynq_defconfig
-$ make ARCH=arm CROSS_COMPILE=arm-xilinx-linux-gnueabi-
-```
+    $ make ARCH=arm CROSS_COMPILE=arm-xilinx-linux-gnueabi- xilinx_zynq_defconfig
+    $ make ARCH=arm CROSS_COMPILE=arm-xilinx-linux-gnueabi-
 
 This will produce a zImage file, however we need a uImage. In order to build a 
 uImage, the Makefile needs to be able to run the `mkimage` program found in 
 `u-boot-Digilent-Dev/tools`. Thus, we'll have to add it to our path:
 
-```sh
-$ export PATH=$PATH:[ZYBO REPO LOCATION]/u-boot-Digilent-Dev/tools
-$ make ARCH=arm CROSS_COMPILE=arm-xilinx-linux-gnueabi- UIMAGE_LOADADDR=0x8000 uImage
-```
+    $ export PATH=$PATH:[ZYBO REPO LOCATION]/u-boot-Digilent-Dev/tools
+    $ make ARCH=arm CROSS_COMPILE=arm-xilinx-linux-gnueabi- UIMAGE_LOADADDR=0x8000 uImage
 
 This will produce the file
 `[ZYBO REPO LOCATION]/Linux-Digilent-Dev/arch/arm/boot/uImage`. Copy this file 
@@ -192,9 +172,7 @@ are. The copy of linux in this repo already contains a modified device tree to
 support the HTIF infrastructure that Rocket needs. To compile it, run the 
 following from inside `[ZYBO REPO LOCATION]/Linux-Digilent-Dev/`.
 
-```sh
-$ ./scripts/dtc/dtc -I dts -O dtb -o devicetree.dtb arch/arm/boot/dts/zynq-zybo.dts
-```
+    $ ./scripts/dtc/dtc -I dts -O dtb -o devicetree.dtb arch/arm/boot/dts/zynq-zybo.dts
 
 This will produce a `devicetree.dtb` file, which you should copy to your sdcard.
 
@@ -215,16 +193,14 @@ a copy of the linux kernel compiled for RISC-V, along with an appropriate
 root filesystem. At this point, the directory structure of your sd card 
 should match the following:
 
-```sh
-SD_ROOT/
-|-> riscv/
-    |-> root_spike.bin
-    |-> vmlinux
-|-> boot.bin
-|-> devicetree.dtb
-|-> uImage
-|-> uramdisk.image.gz
-```
+    SD_ROOT/
+    |-> riscv/
+        |-> root_spike.bin
+        |-> vmlinux
+    |-> boot.bin
+    |-> devicetree.dtb
+    |-> uImage
+    |-> uramdisk.image.gz
 
 Insert the microsd card in your zybo. At this point you have two options for
 logging in:
@@ -233,18 +209,14 @@ logging in:
 
 To connect over usb, do the following (the text following tty. may vary):
 
-```sh
-$ screen /dev/tty.usbserial-210279575138B 115200,cs8,-parenb,-cstopb
-```
+    $ screen /dev/tty.usbserial-210279575138B 115200,cs8,-parenb,-cstopb
 
 2) Telnet
 
 You may also connect over telnet using ethernet. The default IP address is
 `192.168.192.5`:
 
-```sh
-$ telnet 192.168.192.5
-```
+    $ telnet 192.168.192.5
 
 In either case, you'll eventually be prompted to login to the ARM system. Both the 
 username and password are `root`.
@@ -252,16 +224,12 @@ username and password are `root`.
 Once you're in, you'll need to mount the sd card so that we can access the files
 necessary to boot linux on the Rocket core. Do the following:
 
-```sh
-$ mkdir /sdcard
-$ mount /dev/mmcblk0p1 /sdcard
-```
+    $ mkdir /sdcard
+    $ mount /dev/mmcblk0p1 /sdcard
 
 Finally, we can go ahead and boot linux on the Rocket core:
 
-```sh
-$ ./fesvr-zedboard +disk=/sdcard/riscv/root_spike.bin /sdcard/riscv/vmlinux
-```
+    $ ./fesvr-zedboard +disk=/sdcard/riscv/root_spike.bin /sdcard/riscv/vmlinux
 
 Appendices
 --------------
@@ -271,19 +239,15 @@ Appendices
 The RAMDisk that holds linux (uramdisk.image.gz) is a gzipped cpio archive 
 with a u-boot header for the zybo. To open it up (will need sudo):
 
-```sh
-$ dd if=sd_image/uramdisk.image.gz  bs=64 skip=1 of=uramdisk.cpio.gz
-$ mkdir ramdisk
-$ gunzip -c uramdisk.cpio.gz | sudo sh -c 'cd ramdisk/ && cpio -i'
-```
+    $ dd if=sd_image/uramdisk.image.gz  bs=64 skip=1 of=uramdisk.cpio.gz
+    $ mkdir ramdisk
+    $ gunzip -c uramdisk.cpio.gz | sudo sh -c 'cd ramdisk/ && cpio -i'
 
 When changing or adding files, be sure to keep track of owners, groups, and 
 permissions. When you are done, to package it back up:
 
-```sh
-$ sh -c 'cd ramdisk/ && sudo find . | sudo cpio -H newc -o' | gzip -9 > uramdisk.cpio.gz
-$ mkimage -A arm -O linux -T ramdisk -d uramdisk.cpio.gz uramdisk.image.gz
-```
+    $ sh -c 'cd ramdisk/ && sudo find . | sudo cpio -H newc -o' | gzip -9 > uramdisk.cpio.gz
+    $ mkimage -A arm -O linux -T ramdisk -d uramdisk.cpio.gz uramdisk.image.gz
 
 ### Appendix B: Building Slave.v from reference-chip
 
@@ -293,71 +257,67 @@ The following changes were made to allow the design to fit on the Zybo:
 
 1) Remove Rocket's uarch counters:
 
-```
-[Inside Rocket]
-
-diff --git a/src/main/scala/csr.scala b/src/main/scala/csr.scala
-index 2169055..158b749 100644
---- a/src/main/scala/csr.scala
-+++ b/src/main/scala/csr.scala
-@@ -47,7 +47,7 @@ class CSRFileIO(implicit conf: RocketConfiguration) extends Bundle {
-   val evec = UInt(OUTPUT, conf.as.vaddrBits+1)
-   val exception = Bool(INPUT)
-   val retire = UInt(INPUT, log2Up(1+conf.retireWidth))
--  val uarch_counters = Vec.fill(16)(UInt(INPUT, log2Up(1+conf.retireWidth)))
-   +//  val uarch_counters = Vec.fill(16)(UInt(INPUT, log2Up(1+conf.retireWidth)))
-   val cause = UInt(INPUT, conf.xprlen)
-   val badvaddr_wen = Bool(INPUT)
-   val pc = UInt(INPUT, conf.as.vaddrBits+1)
-@@ -78,7 +78,7 @@ class CSRFile(implicit conf: RocketConfiguration) extends Module
-   val reg_status = Reg(new Status) // reset down below
-   val reg_time = WideCounter(conf.xprlen)
-   val reg_instret = WideCounter(conf.xprlen, io.retire)
--  val reg_uarch_counters = io.uarch_counters.map(WideCounter(conf.xprlen, _))
-   +//  val reg_uarch_counters = io.uarch_counters.map(WideCounter(conf.xprlen, _))
-   val reg_fflags = Reg(UInt(width = 5))
-   val reg_frm = Reg(UInt(width = 3))
-
-@@ -192,8 +192,8 @@ class CSRFile(implicit conf: RocketConfiguration) extends Module
-     CSRs.tohost -> reg_tohost,
-     CSRs.fromhost -> reg_fromhost)
-
--  for (i <- 0 until reg_uarch_counters.size)
-   -    read_mapping += (CSRs.uarch0 + i) -> reg_uarch_counters(i)
-        +//  for (i <- 0 until reg_uarch_counters.size)
-+//    read_mapping += (CSRs.uarch0 + i) -> reg_uarch_counters(i)
-
-   io.rw.rdata := Mux1H(for ((k, v) <- read_mapping) yield decoded_addr(k) -> v)
-
-diff --git a/src/main/scala/dpath.scala b/src/main/scala/dpath.scala
-index ea6b59c..b5f143a 100644
---- a/src/main/scala/dpath.scala
-+++ b/src/main/scala/dpath.scala
-@@ -182,7 +182,7 @@ class Datapath(implicit conf: RocketConfiguration) extends Module
-   pcr.io.rocc <> io.rocc
-   pcr.io.pc := wb_reg_pc
-   io.ctrl.csr_replay := pcr.io.replay
--  pcr.io.uarch_counters.foreach(_ := Bool(false))
-   +//  pcr.io.uarch_counters.foreach(_ := Bool(false))
-
-   io.ptw.ptbr := pcr.io.ptbr
-   io.ptw.invalidate := pcr.io.fatc
-```
-
-2) Modify L2CoherenceAgentConfiguration:
-
-```
-[Inside reference-chip]
-diff --git a/src/main/scala/fpga.scala b/src/main/scala/fpga.scala
-index 7f4df49..799ab2a 100644
---- a/src/main/scala/fpga.scala
-+++ b/src/main/scala/fpga.scala
-@@ -85,7 +85,7 @@ class FPGATop extends Module {
-                                           writeMaskBits = WRITE_MASK_BITS,
-                                           wordAddrBits = SUBWORD_ADDR_BITS,
-                                           atomicOpBits = ATOMIC_OP_BITS)
--  implicit val l2 = L2CoherenceAgentConfiguration(tl, 1, 8)
-   +  implicit val l2 = L2CoherenceAgentConfiguration(tl, 1, 4)
-         implicit val mif = MemoryIFConfiguration(MEM_ADDR_BITS, MEM_DATA_BITS, MEM_TAG_BITS, 4)
-   implicit val uc = FPGAUncoreConfiguration(l2, tl, mif, ntiles, nSCR = 64, offsetBits = OFFSET_BITS)
-```
+    [Inside Rocket]
+    
+    diff --git a/src/main/scala/csr.scala b/src/main/scala/csr.scala
+    index 2169055..158b749 100644
+    --- a/src/main/scala/csr.scala
+    +++ b/src/main/scala/csr.scala
+    @@ -47,7 +47,7 @@ class CSRFileIO(implicit conf: RocketConfiguration) extends Bundle {
+       val evec = UInt(OUTPUT, conf.as.vaddrBits+1)
+       val exception = Bool(INPUT)
+       val retire = UInt(INPUT, log2Up(1+conf.retireWidth))
+    -  val uarch_counters = Vec.fill(16)(UInt(INPUT, log2Up(1+conf.retireWidth)))
+       +//  val uarch_counters = Vec.fill(16)(UInt(INPUT, log2Up(1+conf.retireWidth)))
+       val cause = UInt(INPUT, conf.xprlen)
+       val badvaddr_wen = Bool(INPUT)
+       val pc = UInt(INPUT, conf.as.vaddrBits+1)
+    @@ -78,7 +78,7 @@ class CSRFile(implicit conf: RocketConfiguration) extends Module
+       val reg_status = Reg(new Status) // reset down below
+       val reg_time = WideCounter(conf.xprlen)
+       val reg_instret = WideCounter(conf.xprlen, io.retire)
+    -  val reg_uarch_counters = io.uarch_counters.map(WideCounter(conf.xprlen, _))
+       +//  val reg_uarch_counters = io.uarch_counters.map(WideCounter(conf.xprlen, _))
+       val reg_fflags = Reg(UInt(width = 5))
+       val reg_frm = Reg(UInt(width = 3))
+    
+    @@ -192,8 +192,8 @@ class CSRFile(implicit conf: RocketConfiguration) extends Module
+         CSRs.tohost -> reg_tohost,
+         CSRs.fromhost -> reg_fromhost)
+    
+    -  for (i <- 0 until reg_uarch_counters.size)
+       -    read_mapping += (CSRs.uarch0 + i) -> reg_uarch_counters(i)
+            +//  for (i <- 0 until reg_uarch_counters.size)
+    +//    read_mapping += (CSRs.uarch0 + i) -> reg_uarch_counters(i)
+    
+       io.rw.rdata := Mux1H(for ((k, v) <- read_mapping) yield decoded_addr(k) -> v)
+    
+    diff --git a/src/main/scala/dpath.scala b/src/main/scala/dpath.scala
+    index ea6b59c..b5f143a 100644
+    --- a/src/main/scala/dpath.scala
+    +++ b/src/main/scala/dpath.scala
+    @@ -182,7 +182,7 @@ class Datapath(implicit conf: RocketConfiguration) extends Module
+       pcr.io.rocc <> io.rocc
+       pcr.io.pc := wb_reg_pc
+       io.ctrl.csr_replay := pcr.io.replay
+    -  pcr.io.uarch_counters.foreach(_ := Bool(false))
+       +//  pcr.io.uarch_counters.foreach(_ := Bool(false))
+    
+       io.ptw.ptbr := pcr.io.ptbr
+       io.ptw.invalidate := pcr.io.fatc
+    
+    2) Modify L2CoherenceAgentConfiguration:
+    
+    [Inside reference-chip]
+    diff --git a/src/main/scala/fpga.scala b/src/main/scala/fpga.scala
+    index 7f4df49..799ab2a 100644
+    --- a/src/main/scala/fpga.scala
+    +++ b/src/main/scala/fpga.scala
+    @@ -85,7 +85,7 @@ class FPGATop extends Module {
+                                               writeMaskBits = WRITE_MASK_BITS,
+                                               wordAddrBits = SUBWORD_ADDR_BITS,
+                                               atomicOpBits = ATOMIC_OP_BITS)
+    -  implicit val l2 = L2CoherenceAgentConfiguration(tl, 1, 8)
+       +  implicit val l2 = L2CoherenceAgentConfiguration(tl, 1, 4)
+             implicit val mif = MemoryIFConfiguration(MEM_ADDR_BITS, MEM_DATA_BITS, MEM_TAG_BITS, 4)
+       implicit val uc = FPGAUncoreConfiguration(l2, tl, mif, ntiles, nSCR = 64, offsetBits = OFFSET_BITS)
