@@ -306,7 +306,7 @@ The following changes were made to allow the design to fit on the Zybo:
        io.ptw.ptbr := pcr.io.ptbr
        io.ptw.invalidate := pcr.io.fatc
     
-    2) Modify L2CoherenceAgentConfiguration:
+2) Modify L2CoherenceAgentConfiguration:
     
     [Inside reference-chip]
     diff --git a/src/main/scala/fpga.scala b/src/main/scala/fpga.scala
