@@ -1,7 +1,8 @@
-zybo 
+zynq-fpga
 =========
 
 This repo contains the software and instructions necessary to run a RISC-V Rocket Core on the Digilent Zybo board. 
+
 Setup 
 --------------
 
